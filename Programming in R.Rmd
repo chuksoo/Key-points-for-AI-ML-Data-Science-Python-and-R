@@ -1,0 +1,131 @@
+---
+title: "Cheatsheet for Programming in R"
+output: html_notebook
+date: '2022-04-01'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### R vectors
+
+A vector is a data structure that can hold multiple objects of the same data type. For example, `c(45, 25, 89, 10)` creates a numerical vector. To access elements, use the `[ ]` brackets with indexing starting from 1.
+
+```{r}
+my_string_vector <- c("this", "is", "an", "example", "vector")
+my_string_vector[3] # returns "an"
+ 
+my_boolean_vector <- c(TRUE, FALSE, FALSE)
+my_numerical_vector <- c(0.4, 0.9, 1, 0.45, 1.2, 0.33)
+ 
+# R will force the same type even if you input different types to c()
+my_vector <- c("word", 45, 12, FALSE)
+# result: a vector of strings "word" "45" "12" "FALSE"
+```
+
+### R Lists
+
+In R, a list can store a variety of data types and data structures in a single variable. This means a list can hold individual strings and numbers, but also vectors and lists.
+
+To access a single element, use `[[ ]]` double brackets. A list is useful for organization because you can name the elements inside it and select them using $
+
+```{r}
+my_list <- list("Elephant", FALSE, 900, 80.3, list("pencil", "pens"))
+my_list[[4]] # returns 80.3
+ 
+my_longer_list <- list(misc = my_list, notes = c("g", "b", "d", "g"))
+ 
+my_longer_list[[1]]
+# returns the contents of my_list
+my_longer_list$misc
+# returns the contents of my_list
+my_longer_list$notes
+# returns "g" "b" "d" "g"
+```
+### R Matrices
+To create one, use the `matrix()` function with a vector representing the data (R will interpret whether it is repeating or non-repeating), nrow equal to the number of rows, and ncol equal to the number of columns.
+
+To access a single element inside a matrix called ex_matrix, you can look up the item in the rth row and the cth column like so: `ex_matrix[r, ]`.
+
+To access the entire rth row, you can refer to it like so: `ex_matrix[r, c]`. To access the cth column, use `ex_matrix[ , c]`.
+
+```{r}
+# will create a 3-by-3 matrix with the vectors being filled column-wise (default)
+my_matrix <- matrix(c("a", "b", "e", "k", "e", "w", "g", "x", "t"), nrow = 3, ncol = 3)
+# result:
+# "a" "k" "g"
+# "b" "e" "x"
+# "e" "w" "t"
+single_element <- my_matrix[1, 3]
+# returns "g"
+ 
+second_row <- my_matrix[2,]
+# returns: "b" "e" "x"
+second_col <- my_matrix[,2]
+# returns: "k" "e" "w"
+
+```
+
+### R Control Flow
+Control flow involves the program deciding which code to execute. The decision-making is established through conditional statements, i.e. if, else if, and else. Each condition should compute to a logical TRUE or FALSE. You can use comparison operators like !, & and | to combine logical values.
+
+```{r}
+if (condition_to_check) {
+   # execute code and don't check any more conditions
+} else if (other_condition_to_check & and_this_condition_to_check) {
+   # execute code only if both are true and don't check any more conditions
+} else if (either_this_condition | or_this_condition ) {
+   # execute code if either condition is true and don't go to else
+} else {
+   # the default code if none of the conditions above are true
+}
+```
+
+### Loops in R
+```{r}
+# how to define a for loop
+for (loop_variable in sequence) {
+    # code to repeat
+}
+ 
+# how to define a while loop
+while (condition_to_check_every_iteration) {
+    # code to repeat
+}
+```
+
+### Functions in R
+To apply a function onto all the elements in a data structure, we can use one of the apply functions with that function’s name.
+
+ - `apply()` is used on a two-dimensional data structure, and margin value indicates either row or column.
+ - `sapply()` is used on any data structure and returns a vector or matrix depending on the number of dimensions.
+ - `lapply()` is used on any data structure and always returns a list.
+
+```{r, eval=FALSE}
+# the function constructor
+my_function <- function(){}
+
+# define a function
+function_name <- function(parameter_1, parameter_2, ....) {
+   # do something with parameter_1 and parameter_2
+   return(some_value)
+}
+
+apply(data_structure, margin_value, function_name)
+sapply(data structure, function_name)
+lapply(data_structure, function_name)
+```
+
+#### Sample with replacement
+```{r}
+sample(x = 1:6, size = 2, replace = TRUE)
+```
+### Saving Data
+```{r}
+# writing file to csv
+write.csv(file_name, file = "new_file_name.csv", row.names = FALSE)
+
+```
+
+
