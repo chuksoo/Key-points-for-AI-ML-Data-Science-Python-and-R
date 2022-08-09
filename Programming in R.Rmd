@@ -1,13 +1,15 @@
 ---
 title: "Cheatsheet for Programming in R"
 output: html_notebook
-date: '2022-04-01'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+## Basic Data Structures in R
 ### R vectors
 
 A vector is a data structure that can hold multiple objects of the same data type. For example, `c(45, 25, 89, 10)` creates a numerical vector. To access elements, use the `[ ]` brackets with indexing starting from 1.
@@ -70,7 +72,7 @@ second_col <- my_matrix[,2]
 ### R Control Flow
 Control flow involves the program deciding which code to execute. The decision-making is established through conditional statements, i.e. if, else if, and else. Each condition should compute to a logical TRUE or FALSE. You can use comparison operators like !, & and | to combine logical values.
 
-```{r}
+```{r, eval=FALSE}
 if (condition_to_check) {
    # execute code and don't check any more conditions
 } else if (other_condition_to_check & and_this_condition_to_check) {
@@ -83,7 +85,7 @@ if (condition_to_check) {
 ```
 
 ### Loops in R
-```{r}
+```{r, eval=FALSE}
 # how to define a for loop
 for (loop_variable in sequence) {
     # code to repeat
@@ -113,19 +115,164 @@ function_name <- function(parameter_1, parameter_2, ....) {
 }
 
 apply(data_structure, margin_value, function_name)
-sapply(data structure, function_name)
-lapply(data_structure, function_name)
+a_vector_or_matrix <- sapply(data structure, function_name)
+a_list <- lapply(data_structure, function_name)
 ```
 
 #### Sample with replacement
 ```{r}
 sample(x = 1:6, size = 2, replace = TRUE)
 ```
-### Saving Data
-```{r}
+### Reading and Saving Data as csv's
+```{r, eval=FALSE}
+# reading csv
+file_name <- read_csv('file_name.csv')
+
 # writing file to csv
 write.csv(file_name, file = "new_file_name.csv", row.names = FALSE)
 
+```
+
+
+## Statistics in R
+
+```{r, eval=FALSE}
+# statistics for data, x
+x_mean <- mean(x)          # mean
+x_median <- median(x)      # median
+x_mode <- Mode(x)          # mode
+x_variance <- variance(x)  # variance
+x_sd <- sd(x)              # standard deviation
+# variance with function
+variance <- function(x) mean((x-mean(x))^2)
+
+# Quartiles in R
+Quartiles splits the data into four groups of equal size. Those values are called the first quartile (q1), the second quartile (q2), and the third quartile (q3)
+
+q1 <- quantile(df, 0.25)   # first quartile
+q2 <- quantile(df, 0.5)    # second quartile or median
+q3 <- quantile(df, 0.75)   # third quartile
+iqr = q3 - q1 = IQR(df)    # interquartile range or 
+
+# Quantiles
+Quantiles are the set of values/points that divides the dataset into groups of equal size.
+percentile <- quantile(df, percent)
+tenth_percentile <- quantile(df, 0.10) # this is the tenth percentile
+
+# define quartiles and deciles here:
+quartiles <- quantile(df, c(0.25, 0.5, 0.75)) # 4-quantiles
+deciles <- quantile(df, c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)) # also called percentiles
+
+# Hypothesis Test Errors
+Type I Errors occur when a hypothesis test finds a correlation between things that are not related, and Type II Errors occur when a hypothesis test fails to find a correlation between things that are actually related
+
+Type I errors, also known as false positives, is the error of rejecting a null hypothesis when it is actually true. This can be viewed as a miss being registered as a hit. The acceptable rate of this type of error is called significance level and is usually set to be 0.05 (5%) or 0.01 (1%).
+
+Type II errors, also known as false negatives, is the error of not rejecting a null hypothesis when the alternative hypothesis is the true. This can be viewed as a hit being registered as a miss.
+
+# One Sample T-Test
+results <- t.test(sample_distribution, mu = expected_mean)
+
+# Two Sample T-Test, as shown below:
+results <- t.test(distribution_1, distribution_2)
+
+# Probability of error for multiple T-Tests:
+prob_error <- (1-(0.95**number_of_t_tests))
+
+To perform an ANOVA on a data frame `df` with the different samples in column `groups` and values in column `vals`:
+# Analysis of Variance
+results <- aov(vals ~ group, data = df)
+
+# p-value of the ANOVA:
+summary(results)
+```
+
+
+## Data Wranging in R
+```{r, eval=FALSE}
+# Inspect data
+head(df)
+summary(df)
+
+# View number of row
+print(nrow(df))
+
+# Show column names
+print(colnames(df)) | print(names(df))
+
+# Extract single column from a dataframe
+To get a single column from a DataFrame, you can use any of this syntax:
+one_column <- data$column_name
+
+single_column <- data_frame_name %>%
+  select(column_name)
+
+To return a vector instead of a dataframe object, use `pull()`
+single_column <- data_frame_name %>%
+  pull(column_name)
+
+# Filter a dataset and convert data to vector
+new_data_frame <- data_frame %>%
+  filter(column_name <= mean(column_name)) %>%
+  pull(another_column_name)
+
+# Select columns
+select() returns a new data frame containing only the desired columns. When using the pipe, you can read the code as: from the customers table, select() the age and gender columns. 
+
+customers %>%
+  select(age, gender)
+
+# Excluding columns
+To exclude the columns you do not need:
+
+customers %>%
+  select(-name, -phone)
+
+# Filter rows with logic
+Let’s say you want to find all orders made by customers with the first name 'Joyce'.
+
+orders %>%
+  filter(first_name == 'Joyce') # give a new data frame containing only the rows where first_name == 'Joyce' 
+
+orders %>%
+  filter(shoe_material == 'faux-leather', price > 25)
+
+orders %>%
+  filter(shoe_type == 'clogs' | price < 20) # \ represents 'OR'
+
+orders %>%
+  filter(!(shoe_color == red))
+
+# Arranging Rows
+To arrange the customers in ascending order by name:
+
+customers %>%
+  arrange(name)
+
+To arrange the customers in descending order by age:
+
+customers %>%
+  arrange(desc(age))
+
+To `arrange()` a data frame df by `col_c` in descending order after it has undergone a filter() according to condition_a and condition_b after multiple columns have been selected:
+
+result <- df %>%
+  select(-col_1, -col_2) %>%
+  filter(condition_a, condition_b) %>%
+  arrange(desc(col_c))
+
+# Adding a Column
+You can add a new column to the data frame using the mutate() function.
+df %>%
+  mutate(profit = price - cost_to_manufacture,
+         in_stock = TRUE)
+
+
+
+```
+
+```{r, eval=FALSE}
+tryCatch(print(paste("The second quartile of dataset two is",dataset_two_q2)), error=function(e) {print("You haven't defined dataset_two_q2")})
 ```
 
 
