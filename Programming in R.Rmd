@@ -238,7 +238,7 @@ orders %>%
   filter(shoe_material == 'faux-leather', price > 25)
 
 orders %>%
-  filter(shoe_type == 'clogs' | price < 20) # \ represents 'OR'
+  filter(shoe_type == 'clogs' | price < 20) # "|" represents 'OR'
 
 orders %>%
   filter(!(shoe_color == red))
@@ -266,10 +266,96 @@ You can add a new column to the data frame using the mutate() function.
 df %>%
   mutate(profit = price - cost_to_manufacture,
          in_stock = TRUE)
+```
 
+```{r}
+# Examples of Data Wrangling with R
+# load libraries
+library(readr)
+library(dplyr)
+library(tidyr)
 
+# create dataframe
+df <- data.frame(
+	Semester = c("Fall 2016", "Fall 2016", "Spring 2016", "Fall 2017", "Fall 2016"),
+	Class = c("Algorithms_101", "Machine_Learning", "Test_Driven_Development", "UI_Design", "Machine_Learning"),
+	Test_grade = c(98, 78, 82, 91, 78),
+	Year_occurred = c("2008AD", "1959AD", "1945AD", "1184BC", "1959AD"),
+	Exam_score = c("89%", "83%", "91%", "95%", "83%")
+	)
+df
+```
+```{r}
+# To remove any duplicate rows from a dataframe
+no_duplicate_df <- df %>% 
+  distinct()
+no_duplicate_df
+```
+```{r}
+#  `Separate` out season and year in the dataframe
+df %>% 
+  separate(Semester, c('Season', 'Year'), ' ')
 
 ```
+
+```{r}
+# Add new columns to a data frame and drop existing columns using transmute()
+require(stringr)
+no_duplicate_df %>% transmute(
+		year = str_sub(Year_occurred, 1, 4), 
+		suffix = str_sub(Year_occurred, 5, 6)
+	)
+```
+
+```{r}
+# Select columns, filter and arrange rows
+no_duplicate_df %>%
+	select(-Year_occurred, -Exam_score) %>%
+		filter(Semester == 'Fall 2016' | Semester == 'Fall 2017', Test_grade >= 70) %>%
+		arrange(desc(Test_grade))
+
+```
+```{r}
+# Add new columns to a data frame using mutate()
+df <- df %>%
+	mutate(
+		Adjusted_score = Test_grade * (mean(Test_grade)/ 100)
+		) 
+df
+```
+```{r, eval=FALSE}
+# Remove the %s from a set of column, you can use mutate() and gsub() with the below syntax:
+df %>%
+  mutate(column_name_1=gsub('\\%','',column_name_1),
+         column_name_2=gsub('\\%','',column_name_2),
+         column_name_3=gsub('\\%','',column_name_3))
+
+```
+
+```{r}
+df <- df %>% 
+  mutate(Exam_score = gsub('\\%', '', Exam_score))
+```
+
+
+```{r, eval=FALSE}
+# Change the column names of a data frame using rename()
+df %>%
+  rename(semester = Semester,
+         class = Class,
+         score = Test_grade,
+         year = Year_occurred,
+         grade = Exam_score,
+         finals = Adjusted_score
+		 )
+```
+
+```{r}
+# check column names
+original_col_names <- colnames(df)
+original_col_names
+```
+
 
 ```{r, eval=FALSE}
 tryCatch(print(paste("The second quartile of dataset two is",dataset_two_q2)), error=function(e) {print("You haven't defined dataset_two_q2")})
