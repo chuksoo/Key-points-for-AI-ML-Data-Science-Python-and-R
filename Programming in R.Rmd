@@ -217,12 +217,12 @@ new_data_frame <- data_frame %>%
   pull(another_column_name)
 
 # Select columns
-select() returns a new data frame containing only the desired columns. When using the pipe, you can read the code as: from the customers table, select() the age and gender columns. 
+The select() function of dplyr allows users to select all columns of the data frame except for the specified columns. To exclude columns, add the - operator before the name of the column or columns when passing them as an arguments to select(). select() returns a new data frame containing only the desired columns. When using the pipe, you can read the code as: from the customers table, select() the age and gender columns. 
 
 customers %>%
   select(age, gender)
 
-# Excluding columns
+# Excluding columns or drop columns
 To exclude the columns you do not need:
 
 customers %>%
@@ -244,7 +244,7 @@ orders %>%
   filter(!(shoe_color == red))
 
 # Arranging Rows
-To arrange the customers in ascending order by name:
+The arrange() function of the dplyr package orders the rows of a data frame based on the values of a column or a set of columns that are passed as parameters. To arrange the customers in ascending order by name:
 
 customers %>%
   arrange(name)
@@ -272,7 +272,7 @@ df %>%
 # Examples of Data Wrangling with R
 # load libraries
 library(readr)
-library(dplyr)
+library(dplyr) # for data manipulation operations
 library(tidyr)
 
 # create dataframe
@@ -285,6 +285,16 @@ df <- data.frame(
 	)
 df
 ```
+
+```{r}
+# check for duplicate rows
+df %>%
+  duplicated() %>%
+  table()
+```
+
+
+
 ```{r}
 # To remove any duplicate rows from a dataframe
 no_duplicate_df <- df %>% 
@@ -297,7 +307,7 @@ df %>%
   separate(Semester, c('Season', 'Year'), ' ')
 
 ```
-
+The transmute() function, from dpylr, creates new columns from a data frame by transforming existing ones. The result of the function is the new column while all the original columns are removed in the new data frame.
 ```{r}
 # Add new columns to a data frame and drop existing columns using transmute()
 require(stringr)
@@ -315,6 +325,9 @@ no_duplicate_df %>%
 		arrange(desc(Test_grade))
 
 ```
+
+
+The mutate() function from dplyr package adds new columns to an existing data frame based on a transformation of an existing column, while maintaining all the other columns.
 ```{r}
 # Add new columns to a data frame using mutate()
 df <- df %>%
@@ -360,5 +373,74 @@ original_col_names
 ```{r, eval=FALSE}
 tryCatch(print(paste("The second quartile of dataset two is",dataset_two_q2)), error=function(e) {print("You haven't defined dataset_two_q2")})
 ```
+
+## Aggregates in R
+
+### Calculating Aggregate Functions
+
+summarize() function combine all of the values from a column for a single calculation. 
+```{r, eval=FALSE}
+# maximum value of a column in a data frame df
+df %>% 
+  summarize(max_val_of_column = max(column_name, na.rm = TRUE))
+
+# number of unique values in a column of a data frame df
+df %>%
+  summarize(n_distinct_column = n_distinct(column_name))
+```
+
+```{r, eval=FALSE}
+# calculate aggregates with group_by() and summarize()
+df %>%
+  group_by(column_1) %>%
+  summarize(aggregate_name = command(column_2))
+
+where:
+  + column_1 is the column that we want to group_by()
+  + column_2 is the column that we want to apply command(), a summary function, to using summarize()
+  + aggregate_name is the name assigned to the calculated aggregate
+
+# group by more than one column
+df %>%
+  group_by(column_1, column_2) %>%
+  summarize(aggregate_name = command(column_3))
+
+# count of the rows in each group of students 
+grades <- df %>%
+  group_by(student) %>%
+  summarize(count = n())
+
+```
+
+### Combining Grouping with Filter
+While group_by() is most often used with summarize() to calculate summary statistics, it can also be used with the dplyr function filter() to filter rows of a data frame based on per-group metrics.
+```{r, eval=FALSE}
+# group orders by shoe type, filter for orders shoe_type ordered more than 16 times
+orders %>%
+  group_by(shoe_type) %>%
+  filter(n() > X)
+```
+
+### Combining Grouping with Mutate
+group_by() can also be used with the dplyr function mutate() to add columns to a data frame that involve per-group metrics.
+```{r, eval=FALSE}
+students %>% 
+  group_by(age) %>% 
+  mutate(diff_from_age_mean = math_score - mean(math_score, na.rm = TRUE))
+
+```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
 
 
