@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ## Basic Data Structures in R
-### R vectors
+### `R vectors`
 
 A vector is a data structure that can hold multiple objects of the same data type. For example, `c(45, 25, 89, 10)` creates a numerical vector. To access elements, use the `[ ]` brackets with indexing starting from 1.
 
@@ -26,7 +26,7 @@ my_vector <- c("word", 45, 12, FALSE)
 # result: a vector of strings "word" "45" "12" "FALSE"
 ```
 
-### R Lists
+### `R Lists`
 
 In R, a list can store a variety of data types and data structures in a single variable. This means a list can hold individual strings and numbers, but also vectors and lists.
 
@@ -45,7 +45,7 @@ my_longer_list$misc
 my_longer_list$notes
 # returns "g" "b" "d" "g"
 ```
-### R Matrices
+### `R Matrices`
 To create one, use the `matrix()` function with a vector representing the data (R will interpret whether it is repeating or non-repeating), nrow equal to the number of rows, and ncol equal to the number of columns.
 
 To access a single element inside a matrix called ex_matrix, you can look up the item in the rth row and the cth column like so: `ex_matrix[r, ]`.
@@ -69,7 +69,7 @@ second_col <- my_matrix[,2]
 
 ```
 
-### R Control Flow
+### `R Control Flow`
 Control flow involves the program deciding which code to execute. The decision-making is established through conditional statements, i.e. if, else if, and else. Each condition should compute to a logical TRUE or FALSE. You can use comparison operators like !, & and | to combine logical values.
 
 ```{r, eval=FALSE}
@@ -84,7 +84,7 @@ if (condition_to_check) {
 }
 ```
 
-### Loops in R
+### `Loops in R`
 ```{r, eval=FALSE}
 # how to define a for loop
 for (loop_variable in sequence) {
@@ -97,7 +97,7 @@ while (condition_to_check_every_iteration) {
 }
 ```
 
-### Functions in R
+### `Functions in R`
 To apply a function onto all the elements in a data structure, we can use one of the apply functions with that function’s name.
 
  - `apply()` is used on a two-dimensional data structure, and margin value indicates either row or column.
@@ -123,7 +123,7 @@ a_list <- lapply(data_structure, function_name)
 ```{r}
 sample(x = 1:6, size = 2, replace = TRUE)
 ```
-### Reading and Saving Data as csv's
+### `Reading and Saving Data as csv's`
 ```{r, eval=FALSE}
 # reading csv
 file_name <- read_csv('file_name.csv')
@@ -305,9 +305,9 @@ no_duplicate_df
 #  `Separate` out season and year in the dataframe
 df %>% 
   separate(Semester, c('Season', 'Year'), ' ')
-
 ```
-The transmute() function, from dpylr, creates new columns from a data frame by transforming existing ones. The result of the function is the new column while all the original columns are removed in the new data frame.
+
+The `transmute()` function, from dpylr, creates new columns from a data frame by transforming existing ones. The result of the function is the new column while all the original columns are removed in the new data frame.
 ```{r}
 # Add new columns to a data frame and drop existing columns using transmute()
 require(stringr)
@@ -327,7 +327,7 @@ no_duplicate_df %>%
 ```
 
 
-The mutate() function from dplyr package adds new columns to an existing data frame based on a transformation of an existing column, while maintaining all the other columns.
+The `mutate()` function from dplyr package adds new columns to an existing data frame based on a transformation of an existing column, while maintaining all the other columns.
 ```{r}
 # Add new columns to a data frame using mutate()
 df <- df %>%
@@ -376,9 +376,9 @@ tryCatch(print(paste("The second quartile of dataset two is",dataset_two_q2)), e
 
 ## Aggregates in R
 
-### Calculating Aggregate Functions
+### `Calculating Aggregate Functions`
 
-summarize() function combine all of the values from a column for a single calculation. 
+`summarize()` function combine all of the values from a column for a single calculation. 
 ```{r, eval=FALSE}
 # maximum value of a column in a data frame df
 df %>% 
@@ -412,8 +412,8 @@ grades <- df %>%
 
 ```
 
-### Combining Grouping with Filter
-While group_by() is most often used with summarize() to calculate summary statistics, it can also be used with the dplyr function filter() to filter rows of a data frame based on per-group metrics.
+### `Combining Grouping with Filter`
+While `group_by()` is most often used with `summarize()` to calculate summary statistics, it can also be used with the dplyr function `filter()` to filter rows of a data frame based on per-group metrics.
 ```{r, eval=FALSE}
 # group orders by shoe type, filter for orders shoe_type ordered more than 16 times
 orders %>%
@@ -421,8 +421,8 @@ orders %>%
   filter(n() > X)
 ```
 
-### Combining Grouping with Mutate
-group_by() can also be used with the dplyr function mutate() to add columns to a data frame that involve per-group metrics.
+### `Combining Grouping with Mutate`
+`group_by()` can also be used with the dplyr function `mutate()` to add columns to a data frame that involve per-group metrics.
 ```{r, eval=FALSE}
 students %>% 
   group_by(age) %>% 
@@ -430,17 +430,98 @@ students %>%
 
 ```
 
+## Joining Tables in R
+Assume we want to join two tables named `orders` and `customers`. we can apply different kinds of join.
 
-```{r}
+### `Inner_join()`
+The `inner_join()` method looks for columns that are common between two data frames and then looks for rows where those columns’ values are the same. It then combines the matching rows into a single row in a new table.
 
+```{r, eval=FALSE}
+# inner join
+joined_df <- orders %>%
+  inner_join(customers)
 
 ```
 
-
-```{r}
-
+We can use inner join to join multiple dataframe together at once
+```{r, eval=FALSE}
+# inner join for multiple dataframe
+big_df <- orders %>%
+  inner_join(customers) %>%
+  inner_join(products)
 
 ```
 
+### `Join on Specific Columns`
+We can use `rename()` to join two data frames whose columns don’t match. Assume there is an `product_id` column in orders data, we can rename the `id` columns in products data so we can join on `product_id`
+```{r, eval=FALSE}
+# rename the id column of products here:
+products <- products %>%
+  rename(product_id = id) 
 
+```
 
+```{r, eval=FALSE}
+# join orders and products
+orders_products <- orders %>%
+  inner_join(products)
+```
+
+### `Joining using the "by" argument`
+```{r, eval=FALSE}
+# join orders and customers data
+orders %>% 
+  inner_join(customers,
+             by = c('customer_id' = 'id'))
+```
+
+We could use the following code to make the suffixes reflect the table names. We can provide a vector of suffixes to use instead of “_x” and “_y”.
+```{r, eval=FALSE}
+orders %>% 
+  inner_join(customers,
+             by = c('customer_id' = 'id'),
+             suffix = c('_order','_customer'))
+```
+
+### `Full_join()`
+A Full Join would include all rows from both tables, even if they don’t match. Any missing values are filled in with NA.
+
+```{r, eval=FALSE}
+# full join
+full_joined_dfs <- company_a %>%
+  full_join(company_b)
+```
+
+### `Left and Right Joins`
+
+A `Left_join()` includes all rows from the first (left) table, but only rows from the second (right) table that match the first table.
+```{r, eval=FALSE}
+# left join
+left_joined_df <- company_a %>%
+  left_join(company_b)
+
+```
+
+A `Right_join()` is the exact opposite of left join. Here, the joined table will include all rows from the second (right) table, but only rows from the first (left) table that match the second table.
+```{r, eval=FALSE}
+# right join
+right_joined_df <- company_a %>%
+  right_join(company_b)
+
+```
+
+### `Concatenate Data Frames with bind_rows()`
+When we need to reconstruct a single data frame from multiple smaller data frames, we can use the dplyr `bind_rows()` method. This method only works if all of the columns are the same in all of the data frames. If we want to combine these two data frames, we can use the following command:
+
+```{r, eval=FALSE}
+# concatenate two data frames
+concatenated_dfs <- df1 %>%
+  bind_rows(df_2)
+```
+
+```{r, eval=FALSE}
+# concatenate three data frames
+concatenated_dfs <- df1 %>%
+  bind_rows(df_2) %>%
+  bind_rows(df_3) 
+```
