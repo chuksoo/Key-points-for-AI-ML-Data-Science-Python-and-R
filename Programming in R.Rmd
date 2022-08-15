@@ -126,7 +126,7 @@ sample(x = 1:6, size = 2, replace = TRUE)
 ### `Reading and Saving Data as csv's`
 ```{r, eval=FALSE}
 # reading csv
-file_name <- read_csv('file_name.csv')
+file_name <- read.csv('file_name.csv')
 
 # writing file to csv
 write.csv(file_name, file = "new_file_name.csv", row.names = FALSE)
@@ -268,6 +268,13 @@ df %>%
          in_stock = TRUE)
 ```
 
+```{r, eval=FALSE}
+# check for missing value
+df %>%
+  filter(is.na(column_1))
+```
+
+
 ```{r}
 # Examples of Data Wrangling with R
 # load libraries
@@ -396,9 +403,9 @@ df %>%
   summarize(aggregate_name = command(column_2))
 
 where:
-  + column_1 is the column that we want to group_by()
-  + column_2 is the column that we want to apply command(), a summary function, to using summarize()
-  + aggregate_name is the name assigned to the calculated aggregate
+  - column_1 is the column that we want to group_by()
+  - column_2 is the column that we want to apply command(), a summary function, to using summarize()
+  - aggregate_name is the name assigned to the calculated aggregate
 
 # group by more than one column
 df %>%
@@ -488,8 +495,8 @@ A Full Join would include all rows from both tables, even if they don’t match.
 
 ```{r, eval=FALSE}
 # full join
-full_joined_dfs <- company_a %>%
-  full_join(company_b)
+full_joined_dfs <- df_1 %>%
+  full_join(df_2)
 ```
 
 ### `Left and Right Joins`
@@ -497,16 +504,16 @@ full_joined_dfs <- company_a %>%
 A `Left_join()` includes all rows from the first (left) table, but only rows from the second (right) table that match the first table.
 ```{r, eval=FALSE}
 # left join
-left_joined_df <- company_a %>%
-  left_join(company_b)
+left_joined_df <- df_1 %>%
+  left_join(df_2)
 
 ```
 
 A `Right_join()` is the exact opposite of left join. Here, the joined table will include all rows from the second (right) table, but only rows from the first (left) table that match the second table.
 ```{r, eval=FALSE}
 # right join
-right_joined_df <- company_a %>%
-  right_join(company_b)
+right_joined_df <- df_1 %>%
+  right_join(df_2)
 
 ```
 
@@ -524,4 +531,122 @@ concatenated_dfs <- df1 %>%
 concatenated_dfs <- df1 %>%
   bind_rows(df_2) %>%
   bind_rows(df_3) 
+```
+
+## Data Visualization with ggplot2
+The basic units in the “grammar of graphics” consist of:
+
+- The *data* or the actual information that is to be visualized.
+- The *geometries*, shortened to “geoms”, which describe the shapes that represent the data. These shapes can be dots on a scatter plot, bar charts on the graph, or a line to plot the data. Data are mapped to geoms.
+- The *aesthetics*, or the visual attributes of the plot, including the scales on the axes, the color, the fill, and other attributes concerning appearance.
+
+Examples of ggplot2 aesthetics include:
+
+- scales for the x and y axes
+- color of the data points on the plot based on a property or on a color preference
+- the size or shape of different geometries
+
+### `Scatter Plot`
+```{r, eval=FALSE}
+# assign 'aes()' mappings for 'x' and 'y' scales at convas level
+viz <- ggplot(data=df, aes(x=column_1, y=column_2)) + # canvas level creates ggplot object
+  geom_point() +                                      # adds the points layer to the plot
+  geom_smooth()                                       # adds line of best fit
+```
+
+```{r, eval=FALSE}
+# Geom Aesthetics 
+viz <- ggplot(data=df, aes(x=column_1, y=column_2)) + # canvas level creates ggplot object
+  geom_point(aes(color = column_3)) +                 # maps aesthetics to the geom point layer
+  geom_smooth()                                       # adds line of best fit
+```        
+
+```{r, eval=FALSE}
+viz <- ggplot(data=df, aes(x=column_1, y=column_2)) + # canvas level creates ggplot object
+  geom_point(aes(color = column_3), alpha = 0.5) + 
+  labs(title="New Title", subtitle="New subtitle", 
+       y="Y label value", x="X label value", 
+       color = "New legend label")
+```
+
+### `Bar Chart`
+```{r, eval=FALSE}
+bar <- ggplot(books, aes(x=Language)) + 
+  geom_bar(aes(fill=categorical_value)) +             # add color to the bar based on categorical value
+  labs(title="New Title", subtitle="New subtitle")
+bar
+ggsave("bar-example.png")                             # to save visualization locally
+```
+
+## Intermediate Data Visualization
+
+### `Histogram`
+Histograms let us visualize the distribution of a continuous variable
+```{r, eval=FALSE}
+data_histogram <- ggplot(data=df, aes(x = column_1)) +
+  labs(title = "New Title") +
+  geom_histogram(binwidth = new_binwidth)
+
+```
+
+### `Heatmaps`
+```{r, eval=FALSE}
+data_heatmap <- ggplot(data=df, aes(x = column_1, y = column_2)) + 
+  labs(title = "New Title") +
+  geom_bin2d(binwidth = c(x_axis_binwidth, y_axis_binwidth))
+
+```
+
+### `Boxplot`
+```{r, eval=FALSE}
+data_boxplot <- ggplot(data=df, aes(x = column_1, y = column_2)) + 
+  labs(title = "New Title") +
+  geom_boxplot()
+
+```
+
+### `Stacked Bar Plot`
+```{r, eval=FALSE}
+# Stacked bar plot
+data_stackedbar <- 
+  ggplot(data_df, 
+         aes(x = column_1, 
+             y = column_2, 
+             fill = column_3)) + # feature depicted as color-coded segments within the bars of the bar plot.
+  geom_bar(position = "stack",   # create a stacked bar plot where each bar is broken into multiple colors.
+           stat = "identity") +
+  labs(title = "New Title")
+
+# This also creates the same plot!
+data_stackedbar <- 
+  ggplot(data_df, 
+         aes(x = column_1, 
+             y = column_2, 
+             fill = column_3)) + 
+  geom_col() +
+  labs(title = "New Title")
+```
+
+### `Clustered Bar Plots`
+We can represent values of the fill variable side by side instead of stacking them in our bar graphs, using a clustered bar plot
+```{r, eval=FALSE}
+# clustered bar plot
+data_clusteredbar <- 
+  ggplot(clustered_df, 
+         aes(x = column_1, 
+             y = column_2, 
+             fill = column_3)) + 
+  geom_bar(position = "dodge",    # create a clustered bar plot where bar segments are placed side by side
+           stat = "identity") +
+  labs(title = "New Title")
+
+# This also creates the same plot!
+data_clusteredbar <- 
+  ggplot(clustered_df, 
+         aes(x = column_1, 
+             y = column_2, 
+             fill = column_3)) + 
+  geom_col(position = "dodge") +
+  labs(title = "New Title")
+
 ```
