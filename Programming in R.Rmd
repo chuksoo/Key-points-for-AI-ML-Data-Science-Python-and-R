@@ -119,18 +119,23 @@ a_vector_or_matrix <- sapply(data structure, function_name)
 a_list <- lapply(data_structure, function_name)
 ```
 
-#### Sample with replacement
+### `Sample with replacement`
 ```{r}
 sample(x = 1:6, size = 2, replace = TRUE)
 ```
-### `Reading and Saving Data as csv's`
+### `Import .txt file and write to csv`
+```{r Import .txt file and write to csv, eval=FALSE}
+#Import txt file in R
+file_name = read.table("file_name.txt", sep=",", header=TRUE)
+
+# storing this dataframe as csv file
+write.csv(file_name, file = 'file_name.csv', row.names = FALSE)
+```
+
+### `Reading csv file`
 ```{r, eval=FALSE}
 # reading csv
 file_name <- read.csv('file_name.csv')
-
-# writing file to csv
-write.csv(file_name, file = "new_file_name.csv", row.names = FALSE)
-
 ```
 
 
@@ -375,7 +380,14 @@ df %>%
 original_col_names <- colnames(df)
 original_col_names
 ```
+### `Using f-string to print`
 
+```{r, message=FALSE}
+name <- "Eric"
+age <- 42
+sprintf("Hello, %s. You are %s.", name, age)
+
+```
 
 ```{r, eval=FALSE}
 tryCatch(print(paste("The second quartile of dataset two is",dataset_two_q2)), error=function(e) {print("You haven't defined dataset_two_q2")})
@@ -648,5 +660,92 @@ data_clusteredbar <-
              fill = column_3)) + 
   geom_col(position = "dodge") +
   labs(title = "New Title")
+
+```
+
+## Machine Learning in R
+
+### `Assumption of Simple Linear Regression`
+- Linear regression assumes that there is a **linear relationship** between predictor and outcome.
+
+```{r, eval=FALSE}
+# compute correlation coefficient
+coefficient <- cor.test(data$column_1, data$column_2)
+coefficient$estimate
+```
+
+Given that $Y = \beta_0 + \beta_1 * X + error$, we can build a standard `lm()` model as:
+```{r, eval=FALSE}
+# building a simple linear model
+model <- lm(Y ~ X, data = train)
+
+```
+
+To apply linear regression to a dataset, first we split the data into 80% train set and 20% test set
+```{r, eval=FALSE}
+# split the data 80/20 for train and test
+data_sample <- sample(c(TRUE, FALSE), nrow(data), replace = T, prob = c(0.8,0.2))
+
+````
+
+Then we subset data points into train and test sets before applying a machine learning model to the problem.
+```{r, eval=FALSE}
+# subset data points into train and test sets
+train <- data[data_sample, ]
+test <- data[!data_sample, ]
+```
+
+### `Metrics`
+- `Residual standard error (RSE)`
+The RSE is an estimate of the standard deviation of the error of the model 
+```{r, eval=FALSE}
+# RSE of a model
+sigma(model)
+
+# RSE can be found in the summary of a model.
+summary(model)
+```
+
+- `R squared (R^2)`
+R squared represents the proportion of variance explained, so it always takes on a value between 0 and 1.
+```{r, eval=FALSE}
+# R Squared value of a linear regression model
+summary(model)$r.squared
+```
+
+```{r, eval=FALSE}
+# predicted and residual values 
+train$estimate <- predict(model)
+train$residuals <- residuals(model)
+```
+
+- `Mean squared error (MSE)`
+MSE measures the average squared difference between predicted and observed values. 
+```{r, eval = FALSE}
+train %>% 
+  add_predictions(model) %>%
+  summarise(MSE = mean((Y - y_pred)^2))
+
+```
+
+- `Plot of predicted values`
+```{r, eval=FALSE}
+# plot of predicted test values of the model
+plot <- test %>%
+  add_predictions(model) %>%
+  ggplot(aes(x = X, y = Y)) +
+  geom_point() +
+  geom_point(aes(y = y_pred), color = "blue")
+plot
+```
+
+### `Multiple Linear Regression`
+
+A multiple linear regression is a regression in which there are *multiple* predictor variables. The equation is given as:
+$Y = \beta_0 + \beta_1 * X + \beta_2 * X + error$
+
+```{r, eval=FALSE}
+# building a multiple linear regression
+model2 <- lm(Y ~ X + X1, data = train)
 
 ```
