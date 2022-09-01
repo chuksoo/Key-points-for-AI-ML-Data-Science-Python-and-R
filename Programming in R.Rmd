@@ -8,6 +8,45 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r Load packages, message=FALSE, warning=FALSE}
+# Install pacman if needed
+if (!require("pacman")) install.packages("pacman")
+
+# load R packages
+pacman::p_load(pacman,      # used to load multiple packages
+               reticulate,  # embeds a Python session within R 
+               ggplot,      # for awesome graphics
+               tidyverse,   # for data manipulation and visualization
+               dplyr,       # for data wrangling
+               caret,       # for classification training
+               kernlab,     # for fitting SVMs
+               e1071,       # for fitting SVMs
+               kknn         # for k-nearest neighbor classification
+               )
+```
+
+```{r Python Environment check}
+#Check Anaconda environments
+conda_list()
+```
+
+
+```{r Install python packages}
+#use py_install to install Python packages
+py_install(c("pandas", "numpy", "matplotlib", "seaborn", "scikit-learn"))
+```
+
+
+```{python Import python packages for data analysis and machine learning}
+# Load libraries
+from sklearn.svm import LinearSVC
+from sklearn import datasets
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns
+```
+
 
 ## Basic Data Structures in R
 ### `R vectors`
@@ -686,7 +725,7 @@ To apply linear regression to a dataset, first we split the data into 80% train 
 # split the data 80/20 for train and test
 data_sample <- sample(c(TRUE, FALSE), nrow(data), replace = T, prob = c(0.8,0.2))
 
-````
+```
 
 Then we subset data points into train and test sets before applying a machine learning model to the problem.
 ```{r, eval=FALSE}
@@ -749,3 +788,4 @@ $Y = \beta_0 + \beta_1 * X + \beta_2 * X + error$
 model2 <- lm(Y ~ X + X1, data = train)
 
 ```
+
